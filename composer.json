@@ -2,7 +2,13 @@
     "name": "rickywong/tars-php-compiler",
     "description": "tars 接口文件编译器",
     "version":"1.0.0",
+    "type": "library",
+    "license": "MIT",
     "authors": [
+        {
+            "name": "Chen Liang",
+            "email": "liangchen@yuewen.com"
+        },
         {
             "name": "huangweiqiang",
             "email": "ricky.huang@wetax.com.cn"
