@@ -1,7 +1,6 @@
 {
     "name": "rickywong/tars-php-compiler",
     "description": "tars 接口文件编译器",
-    "version":"1.0.0",
     "type": "library",
     "license": "MIT",
     "authors": [
