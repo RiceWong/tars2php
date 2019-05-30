@@ -1,15 +1,23 @@
 {
-    "name": "phptars/tars2php",
-    "description": "php代码自动生成工具",
-    "version":"0.1.3",
+    "name": "rickywong/tars-php-compiler",
+    "description": "tars 接口文件编译器",
+    "version":"1.0.0",
     "authors": [
         {
-            "name": "Chen Liang",
-            "email": "liangchen@yuewen.com"
+            "name": "huangweiqiang",
+            "email": "ricky.huang@wetax.com.cn"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "RickyWong\\Tars\\compiler\\": "src/"
+        }
+    },
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3"
+    },
+    "scripts": {
+        "test": "./tests/test.sh"
     }
 }
