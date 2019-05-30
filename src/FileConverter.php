@@ -252,6 +252,7 @@ class FileConverter {
                         $interfaceName, $this->preStructs, $this->preEnums, $this->servantName,
                         $this->preNamespaceEnums, $this->preNamespaceStructs);
                     $servant = $servantParser->parse();
+                    echo "generate: $file\n";
                     file_put_contents($this->outputDir . $this->moduleName . '/' . $interfaceName . '.php', $servant);
                 } else {
                     $interfaceParser = new InterfaceParser($fp, $line, $this->namespaceName, $this->moduleName,
