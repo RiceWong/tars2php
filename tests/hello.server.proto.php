@@ -14,6 +14,6 @@ return array(
     'tarsFiles' => array(
         './Hello.tars',
     ),
-    'dstPath' => '../src/app/Servant',
-    'namespacePrefix' => 'App\Servant',
+    'dstPath' => './server/',
+    'namespacePrefix' => 'Server\servant',
 );

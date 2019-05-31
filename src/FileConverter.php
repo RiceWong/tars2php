@@ -38,18 +38,27 @@ class FileConverter {
         $this->serverName = $config['serverName'];
         $this->objName = $config['objName'];
 
-        $this->outputDir = realpath($basePath.(empty($config['dstPath']) ? './' : $config['dstPath'] . '/')).'/';
+        $this->namespacePrefix = $config['namespacePrefix'];
+        $this->withServant = $config['withServant'];
+
+        $this->outputDir = $basePath.(empty($config['dstPath']) ? './' : $config['dstPath']);
 
         $pos = strrpos($this->fromFile, '/', -1);
         $inputDir = substr($this->fromFile, 0, $pos);
         $this->inputDir = $inputDir;
 
-        $this->namespacePrefix = $config['namespacePrefix'];
-        $this->withServant = $config['withServant'];
+
 
         $this->initDir();
     }
-
+    protected function writeln($lines){
+        if (!is_array($lines)){
+            $lines = [$lines];
+        }
+        foreach ($lines as $line){
+            echo "$line\n";
+        }
+    }
     /**
      * 首先需要初始化一些文件目录.
      *
@@ -68,22 +77,34 @@ class FileConverter {
             exec('mkdir ' . $this->outputDir . $this->moduleName . '\\tars');
             exec('copy ' . $this->fromFile . ' ' . $this->outputDir . $this->moduleName . '\\tars');
         } else {
-            $appPath = $this->outputDir . $this->appName;
-            $serverPath = $appPath . '/' .  $this->serverName;
-            $objPath = $this->outputDir . $this->appName . '/' . $this->serverName . '/' . $this->objName;
-            if (!is_dir($appPath)){
-                exec('mkdir ' . $appPath);
+            // 目标目录不存在时创建目录
+            if (!is_dir($this->outputDir)){
+                $this->writeln("init output path: ".$this->outputDir);
+                exec("mkdir -p '$this->outputDir'");
             }
-            if (!is_dir($serverPath)){
-                exec('mkdir ' . $serverPath);
+            // 修正输出路径从绝对路径到相对路径
+            $outputDir = realpath($this->outputDir).'/';
+            $this->outputDir = $outputDir;
+            // 必须创建的目录
+            $appName = $this->appName;
+            $serviceName = $this->serverName;
+            $objName = $this->objName;
+            $moduleName = "$appName/$serviceName/$objName";
+            $this->moduleName = $moduleName;
+
+            $paths = [];
+            $paths['module'] = $outputDir. $moduleName;
+            $paths['module_class'] = $paths['module'] . '/classes';
+            $paths['module_tars'] = $paths['module'] . '/tars';
+
+            if (is_dir($paths['module'])){
+                exec('rm -rf ' . $paths['module']);
             }
-            exec('rm -rf ' . $objPath);
-            exec('mkdir ' . $objPath);
-
-            $this->moduleName = $this->appName . '/' . $this->serverName . '/' . $this->objName;
-
-            exec('mkdir ' . $this->outputDir . $this->moduleName . '/classes');
-            exec('mkdir ' . $this->outputDir . $this->moduleName . '/tars');
+            foreach ($paths as $path){
+                if ( !is_dir($path) ){
+                    exec("mkdir -p '$path'");
+                }
+            }
             exec('cp ' . $this->fromFile . ' ' . $this->outputDir . $this->moduleName . '/tars');
         }
 
@@ -235,7 +256,7 @@ class FileConverter {
                     $this->preNamespaceStructs);
                 $structClassStr = $structParser->parse();
                 $file = $this->outputDir . $this->moduleName . '/classes/' . $name . '.php';
-                echo "generate: $file\n";
+                $this->writeln("generate: $file");
                 file_put_contents($file, $structClassStr);
             }
 
@@ -253,7 +274,7 @@ class FileConverter {
                         $this->preNamespaceEnums, $this->preNamespaceStructs);
                     $servant = $servantParser->parse();
                     $file = $this->outputDir . $this->moduleName . '/' . $interfaceName . '.php';
-                    echo "generate: $file\n";
+                    $this->writeln("generate: $file");
                     file_put_contents($file, $servant);
                 } else {
                     $interfaceParser = new InterfaceParser($fp, $line, $this->namespaceName, $this->moduleName,
@@ -261,7 +282,7 @@ class FileConverter {
                         $this->preNamespaceEnums, $this->preNamespaceStructs);
                     $interfaces = $interfaceParser->parse();
                     $file = $this->outputDir . $this->moduleName . '/' . $interfaceName . '.php';
-                    echo "generate: $file\n";
+                    $this->writeln("generate: $file");
                     // 需要区分同步和异步的两种方式
                     file_put_contents($file,  $interfaces['syn']);
                 }
